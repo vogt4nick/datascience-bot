@@ -1,0 +1,3 @@
+black       >=19.3b
+pre-commit  >=1.17
+pylint      >=2.3
