@@ -10,6 +10,8 @@ from typing import Dict, Tuple
 
 import praw
 
+from exceptions import MissingSubmissionError, InvalidTaskError
+
 # config logger
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -21,14 +23,6 @@ logger.addHandler(handler)
 
 # either datascience_bot_dev for testing, or datascience for production
 SUBREDDIT_NAME = os.getenv("SUBREDDIT_NAME")
-
-
-class MissingSubmissionError(Exception):
-    """When we can't find a particular submission."""
-
-
-class InvalidTaskError(Exception):
-    """When the task is invalid for on reason or another"""
 
 
 def get_last_weekly_thread(
@@ -120,7 +114,7 @@ def unsticky_last_weekly_thread(subreddit: praw.models.reddit.subreddit) -> None
     last_weekly_thread = get_last_weekly_thread(subreddit)
     last_weekly_thread.mod.sticky(state=False)
 
-    logger.info("Successfully removed last sticky thread posted by u/datascience-bot")
+    logger.debug("Successfully removed last sticky thread posted by u/datascience-bot")
 
 
 def post_weekly_thread(subreddit: praw.models.reddit.subreddit) -> None:
@@ -169,7 +163,7 @@ def post_weekly_thread(subreddit: praw.models.reddit.subreddit) -> None:
     submission.mod.distinguish()
     submission.mod.sticky(state=True, bottom=True)
 
-    logger.info("Successfully posted weekly entering & transitioning thread")
+    logger.debug("Successfully posted weekly entering & transitioning thread")
 
 
 def main():
