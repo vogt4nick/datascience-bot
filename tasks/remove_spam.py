@@ -10,7 +10,7 @@ from typing import Coroutine
 
 import praw
 
-from exceptions import MissingSubmissionError
+from .exceptions import MissingSubmissionError
 
 
 # config logger

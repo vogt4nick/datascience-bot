@@ -10,7 +10,7 @@ from typing import Dict, Tuple
 
 import praw
 
-from exceptions import MissingSubmissionError, InvalidTaskError
+from .exceptions import MissingSubmissionError, InvalidTaskError
 
 # config logger
 logger = logging.getLogger(__name__)
