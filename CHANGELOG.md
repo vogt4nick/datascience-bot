@@ -12,14 +12,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Fixed
 
-- [x] Distinguished comments now sticky properly.
+- [x] Distinguished comments now sticky properly
 
 ## [2019.9.15.1](https://github.com/vogt4nick/datascience-bot/tree/2019.09.15.1)
 
 ### Fixed
 
-- [x] Patch broken code that made it through testing.
-- [x] Check only the first 5 newest posts every minute, not 100.
+- [x] Patch broken code that made it through testing
+- [x] Check only the first 5 newest posts every minute, not 100
 
 ## [2019.9.15](https://github.com/vogt4nick/datascience-bot/tree/2019.09.15)
 
