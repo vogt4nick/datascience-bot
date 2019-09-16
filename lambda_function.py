@@ -6,7 +6,7 @@ import logging
 import sys
 from typing import Dict
 
-from tasks import post_weekly_thread, remove_spam
+from tasks import refresh_weekly_thread, moderate_submissions
 
 
 # config logger
@@ -80,13 +80,14 @@ def lambda_handler(event: Dict, context) -> Dict:
     task = event["task"]
     kwargs = event["kwargs"]
 
-    if task == "post_weekly_thread":
-        post_weekly_thread.main(**kwargs)
-    elif task == "remove_spam":
-        remove_spam.main(**kwargs)
+    if task == "refresh_weekly_thread":
+        refresh_weekly_thread.main(**kwargs)
+    elif task == "moderate_submissions":
+        moderate_submissions.main(**kwargs)
     else:
         raise UnknownTaskError(f"The given task, '{task}', is not supported")
 
 
 if __name__ == "__main__":
-    lambda_handler(event={"task": "remove_spam", "kwargs": {}}, context=None)
+    lambda_handler(event={"task": "moderate_submissions", "kwargs": {}}, context=None)
+    lambda_handler(event={"task": "refresh_weekly_thread", "kwargs": {}}, context=None)
