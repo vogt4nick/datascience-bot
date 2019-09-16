@@ -44,7 +44,7 @@ def remove_spam_submission(submission: praw.models.reddit.submission) -> None:
     # Remove videos without comment
     if any(url in submission.url for url in BLACKLISTED_URLS):
         submission.mod.remove(spam=True)
-        logger.debug(
+        logger.info(
             f"Removed submission {submission.id} by u/{submission.author} "
             f"from r/{submission.subreddit.display_name}; "
             f"{submission.permalink}"
@@ -64,8 +64,7 @@ def remove_spam_submission(submission: praw.models.reddit.submission) -> None:
             "Your submission has been automatically removed. "
             f"Videos are not allowed in r/{submission.subreddit.display_name}."
         )
-        comment.mod.distinguish()
-        comment.mod.sticky(state=True)
+        comment.mod.distinguish(how='yes', sticky=True)
 
     # Remove blog posts and comment alternative
     elif any(url in submission.url for url in BLOG_URLS):
@@ -75,8 +74,7 @@ def remove_spam_submission(submission: praw.models.reddit.submission) -> None:
             "from that domain. Try sharing the original article and offer "
             "context for discussion in the title of your submission."
         )
-        comment.mod.distinguish()
-        comment.mod.sticky(state=True)
+        comment.mod.distinguish(how='yes', sticky=True)
 
     else:
         logger.warning(
@@ -89,8 +87,8 @@ def remove_spam_submission(submission: praw.models.reddit.submission) -> None:
 
 if __name__ == "__main__":
     SUBREDDIT_NAME = os.getenv("SUBREDDIT_NAME")
-    if SUBREDDIT_NAME != "datascience_bot_dev":
-        raise Exception("Test only against r/datascience_bot_dev!")
+    # if SUBREDDIT_NAME != "datascience_bot_dev":
+    #     raise Exception("Test only against r/datascience_bot_dev!")
 
     reddit = praw.Reddit("datascience-bot", user_agent="datascience-bot")
     subreddit = reddit.subreddit(display_name=SUBREDDIT_NAME)
