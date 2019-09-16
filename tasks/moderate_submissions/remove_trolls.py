@@ -47,7 +47,7 @@ def remove_troll_submission(submission: praw.models.reddit.submission) -> None:
         message_the_mods_url = (
             "https://www.reddit.com/message/compose?to=%2Fr%2Fdatascience"
         )
-        submission.reply(
+        comment = submission.reply(
             f"I removed your post to r/{submission.subreddit.display_name}.\n"
             "\n"
             f"r/{submission.subreddit.display_name} gets a lot of posts from "
@@ -64,6 +64,9 @@ def remove_troll_submission(submission: praw.models.reddit.submission) -> None:
             "with a throwaway account, please "
             f"[message the mods]({message_the_mods_url}) to approve your post."
         )
+        comment.mod.distinguish()
+        comment.mod.sticky(state=True)
+
         submission.mod.remove(spam=False)
 
     logger.debug("Exit remove_troll_submission")
