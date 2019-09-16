@@ -64,8 +64,7 @@ def remove_troll_submission(submission: praw.models.reddit.submission) -> None:
             "with a throwaway account, please "
             f"[message the mods]({message_the_mods_url}) to approve your post."
         )
-        comment.mod.distinguish()
-        comment.mod.sticky(state=True)
+        comment.mod.distinguish(how='yes', sticky=True)
 
         submission.mod.remove(spam=False)
 
