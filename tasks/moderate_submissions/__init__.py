@@ -34,7 +34,7 @@ def main() -> None:
     subreddit = reddit.subreddit(display_name=SUBREDDIT_NAME)
 
     count_spam_submissions = 0
-    for submission in subreddit.new(limit=100):
+    for submission in subreddit.new(limit=5):
         count_spam_submissions += 1
         remove_spam_submission(submission)
         remove_troll_submission(submission)
