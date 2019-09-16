@@ -62,7 +62,7 @@ def remove_spam_submission(submission: praw.models.reddit.submission) -> None:
     elif any(url in submission.url for url in VIDEO_URLS):
         comment = submission.reply(
             "Your submission has been automatically removed. "
-            f"Videos are not allowed in r/{subreddit.display_name}."
+            f"Videos are not allowed in r/{submission.subreddit.display_name}."
         )
         comment.mod.distinguish()
         comment.mod.sticky(state=True)
