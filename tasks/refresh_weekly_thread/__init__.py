@@ -10,8 +10,6 @@ from typing import Dict, Tuple
 
 import praw
 
-from .exceptions import MissingSubmissionError, InvalidTaskError
-
 # config logger
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -21,8 +19,13 @@ formatter = logging.Formatter("%(asctime)s UTC | %(levelname)s | %(message)s")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-# either datascience_bot_dev for testing, or datascience for production
-SUBREDDIT_NAME = os.getenv("SUBREDDIT_NAME")
+
+class MissingSubmissionError(Exception):
+    """When we can't find a particular submission."""
+
+
+class InvalidTaskError(Exception):
+    """When the task is invalid for on reason or another"""
 
 
 def get_last_weekly_thread(
@@ -167,8 +170,12 @@ def post_weekly_thread(subreddit: praw.models.reddit.subreddit) -> None:
 
 
 def main():
+    """Refresh the weekly thread
+    """
     logger.info("Enter post_weekly_thread.main.py")
 
+    # either datascience_bot_dev for testing, or datascience for production
+    SUBREDDIT_NAME = os.getenv("SUBREDDIT_NAME")
     reddit = praw.Reddit("datascience-bot", user_agent="datascience-bot")
     subreddit = reddit.subreddit(display_name=SUBREDDIT_NAME)
 
@@ -193,4 +200,11 @@ def main():
 
 
 if __name__ == "__main__":
+    SUBREDDIT_NAME = os.getenv("SUBREDDIT_NAME")
+    if SUBREDDIT_NAME != "datascience_bot_dev":
+        raise Exception("Test only against r/datascience_bot_dev!")
+
+    reddit = praw.Reddit("datascience-bot", user_agent="datascience-bot")
+    subreddit = reddit.subreddit(display_name=SUBREDDIT_NAME)
+
     main()
