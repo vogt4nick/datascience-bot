@@ -87,6 +87,8 @@ def lambda_handler(event: Dict, context) -> Dict:
     else:
         raise UnknownTaskError(f"The given task, '{task}', is not supported")
 
+    return {"status_code": 200}
+
 
 if __name__ == "__main__":
     lambda_handler(event={"task": "moderate_submissions", "kwargs": {}}, context=None)
