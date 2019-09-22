@@ -31,13 +31,16 @@ PORN_URLS = [
 BLACKLISTED_URLS = VIDEO_URLS + BLOG_URLS + PORN_URLS
 
 
-def remove_spam_submission(submission: praw.models.reddit.submission) -> None:
+def remove_spam_submission(submission: praw.models.reddit.submission) -> bool:
     """Remove submission that links to spam and reply with explanation
     or constructive advice if warranted.
 
     Args:
         submission (praw.models.reddit.submission): Submission to remove as
             spam
+
+    Returns:
+        bool: True if submission is removed, else False
     """
     logger.debug("Enter remove_spam_submission")
 
@@ -50,13 +53,13 @@ def remove_spam_submission(submission: praw.models.reddit.submission) -> None:
             f"{submission.permalink}"
         )
     else:
-        return None
+        return False
 
     # Reply with explanation or constructive advice if warranted.
 
     # Remove porn without comment
     if any(url in submission.url for url in PORN_URLS):
-        pass
+        return True
 
     # Remove video and explain
     elif any(url in submission.url for url in VIDEO_URLS):
@@ -64,7 +67,8 @@ def remove_spam_submission(submission: praw.models.reddit.submission) -> None:
             "Your submission has been automatically removed. "
             f"Videos are not allowed in r/{submission.subreddit.display_name}."
         )
-        comment.mod.distinguish(how='yes', sticky=True)
+        comment.mod.distinguish(how="yes", sticky=True)
+        return True
 
     # Remove blog posts and comment alternative
     elif any(url in submission.url for url in BLOG_URLS):
@@ -74,21 +78,23 @@ def remove_spam_submission(submission: praw.models.reddit.submission) -> None:
             "from that domain. Try sharing the original article and offer "
             "context for discussion in the title of your submission."
         )
-        comment.mod.distinguish(how='yes', sticky=True)
+        comment.mod.distinguish(how="yes", sticky=True)
+        return True
 
     else:
         logger.warning(
             "The given submission exists in BLACKLISTED_URLS, but none of the "
             "constituent lists. This is a programming error."
         )
+        return True
 
     logger.debug("Exit remove_spam_submission")
 
 
 if __name__ == "__main__":
     SUBREDDIT_NAME = os.getenv("SUBREDDIT_NAME")
-    # if SUBREDDIT_NAME != "datascience_bot_dev":
-    #     raise Exception("Test only against r/datascience_bot_dev!")
+    if SUBREDDIT_NAME != "datascience_bot_dev":
+        raise Exception("Test only against r/datascience_bot_dev!")
 
     reddit = praw.Reddit("datascience-bot", user_agent="datascience-bot")
     subreddit = reddit.subreddit(display_name=SUBREDDIT_NAME)

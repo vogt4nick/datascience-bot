@@ -9,8 +9,8 @@ from typing import Coroutine
 
 import praw
 
-from .remove_spam import remove_spam_submission
-from .remove_trolls import remove_troll_submission
+from datascience_bot.remove_spam import remove_spam_submission
+from datascience_bot.remove_trolls import remove_troll_submission
 
 
 # config logger
@@ -36,8 +36,11 @@ def main() -> None:
     count_spam_submissions = 0
     for submission in subreddit.new(limit=5):
         count_spam_submissions += 1
-        remove_spam_submission(submission)
-        remove_troll_submission(submission)
+        # remove_*_submission functions return true if submission is removed
+        if remove_spam_submission(submission):
+            continue
+        if remove_troll_submission(submission):
+            continue
 
     logger.info(
         f"Successfully collected all ({count_spam_submissions}) spam submissions"

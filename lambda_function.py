@@ -6,7 +6,7 @@ import logging
 import sys
 from typing import Dict
 
-from tasks import refresh_weekly_thread, moderate_submissions
+from datascience_bot.cli import refresh_weekly_thread, moderate_submissions
 
 
 # config logger
@@ -86,6 +86,8 @@ def lambda_handler(event: Dict, context) -> Dict:
         moderate_submissions.main(**kwargs)
     else:
         raise UnknownTaskError(f"The given task, '{task}', is not supported")
+
+    return {"status_code": 200}
 
 
 if __name__ == "__main__":
