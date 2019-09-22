@@ -2,10 +2,12 @@
 from datetime import datetime
 import os
 import random
+import time
 
 import praw
 import pytest
 
+from datascience_bot import update, submission_is_deleted, submission_is_removed
 from datascience_bot.cli import moderate_submissions
 
 TEST_TIME = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
@@ -18,17 +20,6 @@ if SUBREDDIT_NAME != "datascience_bot_dev":
 # ----------------------------------------------------------------------------
 # Setup Test Posts
 # ----------------------------------------------------------------------------
-@pytest.fixture
-def low_karma() -> praw.models.reddit.submission:
-    reddit = praw.Reddit("SubstantialStrain6", user_agent="datascience-bot testing")
-    subreddit = reddit.subreddit(display_name=SUBREDDIT_NAME)
-    submission = subreddit.submit(
-        title=f"Test Low Karma | {TEST_TIME}",
-        selftext="This is a test post.",
-        send_replies=False,
-    )
-
-    return submission
 
 
 @pytest.fixture
@@ -58,11 +49,43 @@ def spam_video() -> praw.models.reddit.submission:
     return submission
 
 
+@pytest.fixture
+def low_karma() -> praw.models.reddit.submission:
+    reddit = praw.Reddit("SubstantialStrain6", user_agent="datascience-bot testing")
+    subreddit = reddit.subreddit(display_name=SUBREDDIT_NAME)
+    submission = subreddit.submit(
+        title=f"Test Low Karma | {TEST_TIME}",
+        selftext="This is a test post.",
+        send_replies=False,
+    )
+
+    return submission
+
+
 # ----------------------------------------------------------------------------
 # Run Tests
 # ----------------------------------------------------------------------------
-def test__moderate_submissions(low_karma, spam_video):
+def test__moderate_spam(spam_video):
+    reddit = praw.Reddit("datascience-bot", user_agent="datascience-bot testing")
+    submission = update(spam_video, reddit)
+
+    assert submission_is_removed(submission, reddit) == False
+
     moderate_submissions.main()
+
+    assert submission_is_removed(submission, reddit) == True
+    assert submission.spam == True
+
+
+def test__moderate_low_karma(low_karma):
+    reddit = praw.Reddit("datascience-bot", user_agent="datascience-bot testing")
+    mod_view = update(low_karma, reddit)
+
+    assert submission_is_removed(mod_view, reddit) == False
+
+    moderate_submissions.main()
+
+    assert submission_is_removed(mod_view, reddit) == True
 
 
 if __name__ == "__main__":
