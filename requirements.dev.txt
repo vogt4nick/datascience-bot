@@ -1,3 +1,4 @@
-black       >=19.3b
-pre-commit  >=1.17
-pylint      >=2.3
+black         >=19.3b
+bump2version  >=0.5.10
+pre-commit    >=1.17
+pylint        >=2.3
