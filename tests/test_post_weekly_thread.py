@@ -5,7 +5,7 @@ import os
 import praw
 import pytest
 
-from datascience_bot import refresh_weekly_thread
+from datascience_bot.cli import refresh_weekly_thread
 
 
 TEST_TIME = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
