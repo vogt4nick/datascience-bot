@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Added
 
+- [x] Restructured repository as a python package with CLI entrypoints
 - [x] Shell script to quickly package code for AWS Lambda
 - [x] Created CHANGELOG.md
 
