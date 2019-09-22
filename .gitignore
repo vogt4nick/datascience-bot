@@ -1,3 +1,5 @@
+*.zip
+temp-*/
 config-env.sh
 .vscode/
 praw.ini
