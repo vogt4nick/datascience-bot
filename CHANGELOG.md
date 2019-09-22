@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Added
 
-- [x] Shell script to quickly package code for AWS Lambda 
+- [x] Shell script to quickly package code for AWS Lambda
 - [x] Created CHANGELOG.md
 
 ## [2019.9.15.2](https://github.com/vogt4nick/datascience-bot/tree/2019.09.15.2)

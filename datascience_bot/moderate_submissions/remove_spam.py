@@ -64,7 +64,7 @@ def remove_spam_submission(submission: praw.models.reddit.submission) -> None:
             "Your submission has been automatically removed. "
             f"Videos are not allowed in r/{submission.subreddit.display_name}."
         )
-        comment.mod.distinguish(how='yes', sticky=True)
+        comment.mod.distinguish(how="yes", sticky=True)
 
     # Remove blog posts and comment alternative
     elif any(url in submission.url for url in BLOG_URLS):
@@ -74,7 +74,7 @@ def remove_spam_submission(submission: praw.models.reddit.submission) -> None:
             "from that domain. Try sharing the original article and offer "
             "context for discussion in the title of your submission."
         )
-        comment.mod.distinguish(how='yes', sticky=True)
+        comment.mod.distinguish(how="yes", sticky=True)
 
     else:
         logger.warning(
