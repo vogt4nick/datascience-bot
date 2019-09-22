@@ -19,12 +19,12 @@ pushd $TEMPDIR
 # remove __pycache__ files
 find . -name __pycache__ -exec rm -r {} \;
 
-
 ## Import requirements for AWS Lambda
 ## https://aws.amazon.com/premiumsupport/knowledge-center/build-python-lambda-deployment-package/
 pip install -r requirements.txt -t ./
 chmod -R 755 .
-
 zip -r "../datascience-bot-${EPOCH}.zip" .
 
 popd
+
+rm -rf ${TEMPDIR}
