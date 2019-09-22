@@ -6,7 +6,7 @@ import logging
 import sys
 from typing import Dict
 
-from tasks import refresh_weekly_thread, moderate_submissions
+from datascience_bot.cli import refresh_weekly_thread, moderate_submissions
 
 
 # config logger
