@@ -163,7 +163,7 @@ def post_weekly_thread(subreddit: praw.models.reddit.subreddit) -> None:
         "\n"
         f"[You can also search for past weekly threads here]({past_threads_url}).\n"
         "\n"
-        f"^(Posted at {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')} UTC)"
+        f"^(Posted at {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC)"
     )
 
     ## 2. Post the submission
@@ -200,9 +200,10 @@ def main():
     try:
         unsticky_last_weekly_thread(subreddit)
     except MissingSubmissionError as err:
-        raise MissingSubmissionError(err)
-    else:
-        post_weekly_thread(subreddit)
+        pass
+        # raise MissingSubmissionError(err)
+    # else:
+    post_weekly_thread(subreddit)
 
     logger.info("Exit post_weekly_thread.main.py")
 

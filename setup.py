@@ -13,16 +13,16 @@ setup(
     name="datascience_bot",
     version=version["__version__"],
     description="datascience_bot",
-    long_description=open("readme.rst").read(),
-    long_description_content_type="text/x-rst",
+    long_description=open("readme.md").read(),
+    long_description_content_type="text/markdown",
     url="https://github.com/vogt4nick/datascience_bot",
     author="vogt4nick",
     author_email="vogt4nick@gmail.com",
     packages=find_packages(exclude=["tests"]),
     entry_points={
         "console_scripts": [
-            "refresh-weekly-thread = datascience_bot.refresh_weekly_thread:main",
-            "moderate-submissions = datascience_bot.moderate_submissions:main",
+            "refresh-weekly-thread = datascience_bot.cli.refresh_weekly_thread:main",
+            "moderate-submissions = datascience_bot.cli.moderate_submissions:main",
         ]
     },
     install_requires=requirements,
