@@ -123,12 +123,18 @@ def unsticky_last_weekly_thread(subreddit: praw.models.reddit.subreddit) -> None
 def post_weekly_thread(subreddit: praw.models.reddit.subreddit) -> None:
     """Post the weekly thread with required attributes
 
+    `post_weekly_thread` does three things:
+        1. Create the submission title and selftext
+        2. Post the submission
+        3. Distinguish, sticky, flair, etc.
+
     Args:
         subreddit (praw.models.reddit.subreddit): which subreddit to post
             weekly thread
     """
     logger.info("Post weekly entering & transitioning thread")
 
+    ## 1. Create the submission title and selftext
     # e.g. Weekly Entering & Transitioning Thread | 15 Sep 2019 - 22 Sep 2019
     title = (
         "Weekly Entering & Transitioning Thread | "
@@ -159,8 +165,11 @@ def post_weekly_thread(subreddit: praw.models.reddit.subreddit) -> None:
         "\n"
         f"^(Posted at {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')} UTC)"
     )
+
+    ## 2. Post the submission
     submission = subreddit.submit(title=title, selftext=selftext, send_replies=False)
-    # Set thread attributes
+
+    ## 3. Distinguish, sticky, flair, etc.
     submission.mod.flair(text="Discussion")
     submission.mod.approve()
     submission.mod.distinguish()
@@ -190,11 +199,10 @@ def main():
 
     try:
         unsticky_last_weekly_thread(subreddit)
-    except MissingSubmissionError:
-        # just warn about this error until we're fully operational
-        logger.warning("Unable to find last submission")
-
-    post_weekly_thread(subreddit)
+    except MissingSubmissionError as err:
+        raise MissingSubmissionError(err)
+    else:
+        post_weekly_thread(subreddit)
 
     logger.info("Exit post_weekly_thread.main.py")
 
