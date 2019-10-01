@@ -120,7 +120,4 @@ def pytest_sessionstart(session):
     before performing collection and entering the run test loop.
     """
     remove_all_datascience_bot_dev_submissions()
-
-
-if __name__ == "__main__":
     remove_all_user_submissions_to_datascience_bot_dev()
