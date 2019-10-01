@@ -18,3 +18,5 @@ deploy:
   runtime: "python3.7"
   handler_name: "lambda_function.lambda_handler"
   function_name: "datascience-bot-test"
+  on:
+    branch: "11/automate-lambda-deployments"
