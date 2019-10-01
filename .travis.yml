@@ -1,3 +1,4 @@
+# Run tests w/ pytest
 language: python
 python: "3.7"
 before_install:
@@ -7,4 +8,13 @@ before_install:
   - pip install -r requirements.txt
 install:
   - pip install .
-script: pytest
+script:
+  - pytest
+# Deploy to AWS Lambda
+deploy:
+  provider: lambda
+  region: "us-east-1"
+  role: "arn:aws:iam::491984534845:user/datascience-bot-travis-ci"
+  runtime: "python3.7"
+  handler_name: "lambda_function.lambda_handler"
+  function_name: "datascience-bot-test"
