@@ -23,7 +23,7 @@ if SUBREDDIT_NAME != "datascience_bot_dev":
 
 
 @pytest.fixture
-def spam_video() -> praw.models.reddit.submission:
+def spam_video(b3405920_reddit) -> praw.models.reddit.submission:
     """Post a spam video for datascience-bot to remove
 
     Returns:
@@ -40,7 +40,7 @@ def spam_video() -> praw.models.reddit.submission:
     ])
     # fmt: on
 
-    reddit = praw.Reddit("b3405920", user_agent="datascience-bot testing")
+    reddit = b3405920_reddit
     subreddit = reddit.subreddit(display_name=SUBREDDIT_NAME)
     submission = subreddit.submit(
         f"Test Video Spam | {TEST_TIME}", url=SPAM_VIDEO_URL, send_replies=False
@@ -50,8 +50,8 @@ def spam_video() -> praw.models.reddit.submission:
 
 
 @pytest.fixture
-def low_karma() -> praw.models.reddit.submission:
-    reddit = praw.Reddit("SubstantialStrain6", user_agent="datascience-bot testing")
+def low_karma(SubstantialStrain6_reddit) -> praw.models.reddit.submission:
+    reddit = SubstantialStrain6_reddit
     subreddit = reddit.subreddit(display_name=SUBREDDIT_NAME)
     submission = subreddit.submit(
         title=f"Test Low Karma | {TEST_TIME}",
@@ -65,8 +65,8 @@ def low_karma() -> praw.models.reddit.submission:
 # ----------------------------------------------------------------------------
 # Run Tests
 # ----------------------------------------------------------------------------
-def test__moderate_spam(spam_video):
-    reddit = praw.Reddit("datascience-bot", user_agent="datascience-bot testing")
+def test__moderate_spam(datascience_bot_reddit, spam_video):
+    reddit = datascience_bot_reddit
     submission = update(spam_video, reddit)
 
     assert submission_is_removed(submission, reddit) == False
@@ -77,8 +77,8 @@ def test__moderate_spam(spam_video):
     assert submission.spam == True
 
 
-def test__moderate_low_karma(low_karma):
-    reddit = praw.Reddit("datascience-bot", user_agent="datascience-bot testing")
+def test__moderate_low_karma(datascience_bot_reddit, low_karma):
+    reddit = datascience_bot_reddit
     mod_view = update(low_karma, reddit)
 
     assert submission_is_removed(mod_view, reddit) == False

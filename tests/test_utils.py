@@ -5,22 +5,30 @@ import os
 import praw
 import pytest
 
-from datascience_bot import update, submission_is_deleted, submission_is_removed
+from datascience_bot import (
+    update,
+    submission_is_deleted,
+    submission_is_removed,
+    get_datascience_bot,
+    get_SubstantialStrain6,
+    get_b3405920,
+)
 
 TEST_TIME = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
 
 
-def test__update():
-    reddit = praw.Reddit("SubstantialStrain6", user_agent="datascience-bot testing")
-    subreddit = reddit.subreddit(display_name="datascience_bot_dev")
+# def test__update(SubstantialStrain6_reddit):
+#     reddit = SubstantialStrain6_reddit
+#     subreddit = reddit.subreddit(display_name="datascience_bot_dev")
 
-    return None
+#     return None
 
 
-def test__submission_is_deleted():
+def test__submission_is_deleted(datascience_bot_reddit, SubstantialStrain6_reddit):
     ## Create a post with u/SubstantialStrain6
+    # fmt: off
     user_submission = (
-        praw.Reddit("SubstantialStrain6", user_agent="datascience-bot testing")
+        SubstantialStrain6_reddit
         .subreddit(display_name="datascience_bot_dev")
         .submit(
             title=f"Test datascience_bot:submission_is_removed | {TEST_TIME}",
@@ -28,9 +36,10 @@ def test__submission_is_deleted():
             send_replies=False,
         )
     )
+    # fmt: on
 
     # View u/SubstantialStrain6's post with u/datascience-bot
-    mod = praw.Reddit("datascience-bot", user_agent="datascience-bot testing")
+    mod = datascience_bot_reddit
     submission = update(user_submission, mod)
 
     assert submission_is_deleted(submission, mod) == False
@@ -40,10 +49,11 @@ def test__submission_is_deleted():
     assert submission_is_deleted(submission, mod) == True
 
 
-def test__submission_is_removed():
+def test__submission_is_removed(datascience_bot_reddit, SubstantialStrain6_reddit):
     ## Create a post with u/SubstantialStrain6
+    # fmt: off
     user_submission = (
-        praw.Reddit("SubstantialStrain6", user_agent="datascience-bot testing")
+        SubstantialStrain6_reddit
         .subreddit(display_name="datascience_bot_dev")
         .submit(
             title=f"Test datascience_bot:submission_is_removed | {TEST_TIME}",
@@ -51,9 +61,10 @@ def test__submission_is_removed():
             send_replies=False,
         )
     )
+    # fmt: on
 
     # View u/SubstantialStrain6's post with u/datascience-bot
-    mod = praw.Reddit("datascience-bot", user_agent="datascience-bot testing")
+    mod = datascience_bot_reddit
     submission = update(user_submission, mod)
 
     assert submission_is_removed(submission, mod) == False
@@ -61,3 +72,15 @@ def test__submission_is_removed():
     submission.mod.remove(spam=False)
 
     assert submission_is_removed(submission, mod) == True
+
+
+def test_get_datascience_bot():
+    assert isinstance(get_datascience_bot(), praw.reddit.Reddit)
+
+
+def test_get_SubstaintialStrain6():
+    assert isinstance(get_SubstantialStrain6(), praw.reddit.Reddit)
+
+
+def test_get_b3405920():
+    assert isinstance(get_b3405920(), praw.reddit.Reddit)

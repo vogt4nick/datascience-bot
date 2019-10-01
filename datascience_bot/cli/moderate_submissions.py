@@ -9,6 +9,7 @@ from typing import Coroutine
 
 import praw
 
+from datascience_bot import get_datascience_bot
 from datascience_bot.remove_spam import remove_spam_submission
 from datascience_bot.remove_trolls import remove_troll_submission
 
@@ -30,7 +31,7 @@ def main() -> None:
     # either datascience_bot_dev for testing, or datascience for production
     SUBREDDIT_NAME = os.getenv("SUBREDDIT_NAME")
 
-    reddit = praw.Reddit("datascience-bot", user_agent="datascience-bot")
+    reddit = get_datascience_bot()
     subreddit = reddit.subreddit(display_name=SUBREDDIT_NAME)
 
     count_spam_submissions = 0
@@ -48,11 +49,13 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    from datascience_bot import get_datascience_bot
+
     SUBREDDIT_NAME = os.getenv("SUBREDDIT_NAME")
     if SUBREDDIT_NAME != "datascience_bot_dev":
         raise Exception("Test only against r/datascience_bot_dev!")
 
-    reddit = praw.Reddit("datascience-bot", user_agent="datascience-bot")
+    reddit = get_datascience_bot()
     subreddit = reddit.subreddit(display_name=SUBREDDIT_NAME)
 
     main()

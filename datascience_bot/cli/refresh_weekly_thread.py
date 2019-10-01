@@ -10,6 +10,8 @@ from typing import Dict, Tuple
 
 import praw
 
+from datascience_bot import get_datascience_bot
+
 # config logger
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -185,7 +187,7 @@ def main():
 
     # either datascience_bot_dev for testing, or datascience for production
     SUBREDDIT_NAME = os.getenv("SUBREDDIT_NAME")
-    reddit = praw.Reddit("datascience-bot", user_agent="datascience-bot")
+    reddit = get_datascience_bot()
     subreddit = reddit.subreddit(display_name=SUBREDDIT_NAME)
 
     logger.info(f"Acting on subreddit: {subreddit.display_name}")
@@ -209,11 +211,13 @@ def main():
 
 
 if __name__ == "__main__":
+    from datascience_bot import get_datascience_bot
+
     SUBREDDIT_NAME = os.getenv("SUBREDDIT_NAME")
     if SUBREDDIT_NAME != "datascience_bot_dev":
         raise Exception("Test only against r/datascience_bot_dev!")
 
-    reddit = praw.Reddit("datascience-bot", user_agent="datascience-bot")
+    reddit = get_datascience_bot()
     subreddit = reddit.subreddit(display_name=SUBREDDIT_NAME)
 
     main()
