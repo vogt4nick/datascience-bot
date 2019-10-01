@@ -92,11 +92,13 @@ def remove_spam_submission(submission: praw.models.reddit.submission) -> bool:
 
 
 if __name__ == "__main__":
+    from datascience_bot import get_datascience_bot
+
     SUBREDDIT_NAME = os.getenv("SUBREDDIT_NAME")
     if SUBREDDIT_NAME != "datascience_bot_dev":
         raise Exception("Test only against r/datascience_bot_dev!")
 
-    reddit = praw.Reddit("datascience-bot", user_agent="datascience-bot")
+    reddit = get_datascience_bot()
     subreddit = reddit.subreddit(display_name=SUBREDDIT_NAME)
 
     for submission in subreddit.new(limit=100):

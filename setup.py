@@ -13,7 +13,7 @@ setup(
     name="datascience_bot",
     version=version["__version__"],
     description="datascience_bot",
-    long_description=open("readme.md").read(),
+    long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/vogt4nick/datascience_bot",
     author="vogt4nick",

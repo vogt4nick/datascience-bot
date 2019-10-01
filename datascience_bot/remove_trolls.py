@@ -22,7 +22,6 @@ def remove_troll_submission(submission: praw.models.reddit.submission) -> None:
     logger.debug("Enter remove_troll_submission")
 
     redditor = submission.author
-
     if submission.approved:
         return None
 
@@ -72,11 +71,13 @@ def remove_troll_submission(submission: praw.models.reddit.submission) -> None:
 
 
 if __name__ == "__main__":
+    from datascience_bot import get_datascience_bot
+
     SUBREDDIT_NAME = os.getenv("SUBREDDIT_NAME")
     if SUBREDDIT_NAME != "datascience_bot_dev":
         raise Exception("Test only against r/datascience_bot_dev!")
 
-    reddit = praw.Reddit("datascience-bot", user_agent="datascience-bot")
+    reddit = get_datascience_bot()
     subreddit = reddit.subreddit(display_name=SUBREDDIT_NAME)
 
     for submission in subreddit.new(limit=100):
