@@ -10,7 +10,6 @@ rm -rf TEMPDIR
 mkdir ${TEMPDIR}
 cp LICENSE ${TEMPDIR}
 cp README.md ${TEMPDIR}
-cp praw.ini ${TEMPDIR}
 cp requirements.txt ${TEMPDIR}
 cp lambda_function.py ${TEMPDIR}
 cp -r datascience_bot/ ${TEMPDIR}/datascience_bot
@@ -25,7 +24,7 @@ find . -name __pycache__ -exec rm -r {} \;
 ## https://aws.amazon.com/premiumsupport/knowledge-center/build-python-lambda-deployment-package/
 pip install -r requirements.txt -t ./
 chmod -R 755 .
-zip -r "../datascience-bot-${VERSION}.zip" .
+zip -r "../datascience-bot.zip" .
 
 popd
 
