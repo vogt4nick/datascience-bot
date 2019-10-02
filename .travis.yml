@@ -23,6 +23,7 @@ deploy:
     function_name: datascience-bot
     module_name: lambda_function
     handler_name: lambda_handler
+    timeout: 15
     zip: datascience-bot.zip
     on:
       branch: master
