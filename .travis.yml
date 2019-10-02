@@ -12,12 +12,17 @@ script:
   - pytest
 # Deploy to AWS Lambda
 deploy:
-  provider: lambda
-  region: "us-east-1"
-  role: "arn:aws:iam::491984534845:role/datascience-bot-travis-ci"
-  runtime: "python3.7"
-  function_name: "datascience-bot-test"
-  module_name: "lambda_function"
-  handler_name: "lambda_handler"
-  on:
-    branch: "11/automate-lambda-deployments"
+  - provider: script
+    script: bash zip-deployment.sh
+    on:
+      branch: 11/automate-lambda-deployments
+  - provider: lambda
+    region: us-east-1
+    role: arn:aws:iam::491984534845:role/datascience-bot-travis-ci
+    runtime: python3.7
+    function_name: datascience-bot-test
+    module_name: lambda_function
+    handler_name: lambda_handler
+    zip: datascience-bot.zip
+    on:
+      branch: 11/automate-lambda-deployments
