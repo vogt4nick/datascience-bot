@@ -47,7 +47,7 @@ def remove_troll_submission(submission: praw.models.reddit.submission) -> None:
             "https://www.reddit.com/message/compose?to=%2Fr%2Fdatascience"
         )
         comment = submission.reply(
-            f"I removed your post to r/{submission.subreddit.display_name}.\n"
+            f"I removed your submission to r/{submission.subreddit.display_name}.\n"
             "\n"
             f"r/{submission.subreddit.display_name} gets a lot of posts from "
             "new redditors. It's likely your topic or question has been "
