@@ -10,7 +10,6 @@ rm -rf TEMPDIR
 mkdir ${TEMPDIR}
 cp LICENSE ${TEMPDIR}
 cp README.md ${TEMPDIR}
-cp praw.ini ${TEMPDIR}
 cp requirements.txt ${TEMPDIR}
 cp lambda_function.py ${TEMPDIR}
 cp -r datascience_bot/ ${TEMPDIR}/datascience_bot
