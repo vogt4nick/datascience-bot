@@ -28,8 +28,10 @@ def main():
     reddit = get_datascience_bot()
     subreddit = reddit.subreddit(SUBREDDIT_NAME)
 
-    local_dir = (pathlib.Path(__file__).parent / ".." / ".." / "wiki").resolve()
+    local_dir = (pathlib.Path(__file__).parent / ".." / "wiki").resolve()
     for f in local_dir.iterdir():
+        if f.is_dir():
+            continue
         page_name = f.stem
         logging.info(f"Updating wiki page: {page_name}")
 
