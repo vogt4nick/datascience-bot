@@ -16,11 +16,12 @@ if SUBREDDIT_NAME != "datascience_bot_dev":
 
 
 def test__update_wiki(datascience_bot_reddit):
-    datascience_bot = datascience_bot_reddit
+    from datascience_bot import wiki
 
-    local_wiki_dir = pathlib.Path(__file__).parent / ".." / "wiki"
+    local_wiki_dir = pathlib.Path(wiki.__file__).parent
     valid_wiki_pages = [p.stem for p in local_wiki_dir.iterdir()]
 
+    datascience_bot = datascience_bot_reddit
     for wiki_page in datascience_bot.subreddit(SUBREDDIT_NAME).wiki:
         if wiki_page.name not in valid_wiki_pages:
             continue
