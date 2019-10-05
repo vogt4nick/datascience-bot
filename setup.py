@@ -26,7 +26,6 @@ setup(
         ]
     },
     install_requires=requirements,
-    include_package_data=True,  # include MANIFEST.in
     test_suite="tests",
     tests_require="pytest",
     classifiers=[
