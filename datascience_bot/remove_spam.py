@@ -7,6 +7,8 @@ from typing import Coroutine
 
 import praw
 
+from datascience_bot import add_boilerplate
+
 
 logger = logging.getLogger(__name__)
 
@@ -63,21 +65,23 @@ def remove_spam_submission(submission: praw.models.reddit.submission) -> bool:
 
     # Remove video and explain
     elif any(url in submission.url for url in VIDEO_URLS):
-        comment = submission.reply(
+        text = add_boilerplate(
             "I removed your submission. "
             f"Videos are not allowed in r/{submission.subreddit.display_name}."
         )
+        comment = submission.reply(text)
         comment.mod.distinguish(how="yes", sticky=True)
         return True
 
     # Remove blog posts and comment alternative
     elif any(url in submission.url for url in BLOG_URLS):
-        comment = submission.reply(
+        text = add_boilerplate(
             "I removed your submission. "
             f"r/{submission.subreddit.display_name} receives a lot of spam "
             "from that domain. Try sharing the original article and offer "
             "context for discussion in the title of your submission."
         )
+        comment = submission.reply(text)
         comment.mod.distinguish(how="yes", sticky=True)
         return True
 

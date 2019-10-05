@@ -8,10 +8,35 @@ import praw
 __author__ = "vogt4nick"
 __copyright__ = "Copyright 2019, Nick Vogt"
 __license__ = "MIT"
-__version__ = "2019.10.2"
+__version__ = "2019.10.4"
 __maintainer__ = "vogt4nick"
 __email__ = "vogt4nick@gmail.com"
 __status__ = "Production"
+
+
+def add_boilerplate(text: str) -> str:
+    """Format text with boilerplate so readers know it's a bot
+
+    Args:
+        text (str): Text to add boilerplate to
+
+    Return:
+        str: Text with boilerplate
+    """
+    if not isinstance(text, str):
+        raise TypeError("text must be a str")
+
+    source_code_on_github = (
+        "[source code on GitHub](https://github.com/vogt4nick/datascience-bot)"
+    )
+    greeting = "_Bleep Bloop_. "
+    footer = (
+        "\n\n---\n\n"
+        "I am a bot created by the r/datascience moderators. "
+        f"I'm open source! You can review my {source_code_on_github}."
+    )
+
+    return "".join([greeting, text, footer])
 
 
 def update(target, reddit: praw.models.reddit):

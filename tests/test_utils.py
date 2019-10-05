@@ -6,6 +6,7 @@ import praw
 import pytest
 
 from datascience_bot import (
+    add_boilerplate,
     update,
     submission_is_deleted,
     submission_is_removed,
@@ -15,6 +16,11 @@ from datascience_bot import (
 )
 
 TEST_TIME = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+
+
+def test__add_boilerplate():
+    test = "This is a test."
+    assert test != add_boilerplate(test)
 
 
 # def test__update(SubstantialStrain6_reddit):
@@ -74,13 +80,13 @@ def test__submission_is_removed(datascience_bot_reddit, SubstantialStrain6_reddi
     assert submission_is_removed(submission, mod) == True
 
 
-def test_get_datascience_bot():
+def test__get_datascience_bot():
     assert isinstance(get_datascience_bot(), praw.reddit.Reddit)
 
 
-def test_get_SubstaintialStrain6():
+def test__get_SubstaintialStrain6():
     assert isinstance(get_SubstantialStrain6(), praw.reddit.Reddit)
 
 
-def test_get_b3405920():
+def test__get_b3405920():
     assert isinstance(get_b3405920(), praw.reddit.Reddit)
