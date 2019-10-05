@@ -480,4 +480,4 @@ __What does the Apple data science interview process look like?__
 
 ---
 
-See something missing? Visit our [GitHub Repo](https://github.com/vogt4nick/datascience-wiki) and make a pull request.
+See something missing? Visit our [GitHub Repo](https://github.com/vogt4nick/datascience-bot) and make a pull request.
