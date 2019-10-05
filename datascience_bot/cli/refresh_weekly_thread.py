@@ -10,7 +10,7 @@ from typing import Dict, Tuple
 
 import praw
 
-from datascience_bot import get_datascience_bot
+from datascience_bot import get_datascience_bot, add_boilerplate
 
 # config logger
 logger = logging.getLogger(__name__)
@@ -145,11 +145,11 @@ def post_weekly_thread(subreddit: praw.models.reddit.subreddit) -> None:
     ).strip()
 
     # Long URLs we'll use to format the selftext
-    faq_url = "https://www.reddit.com/r/datascience/wiki/frequently-asked-questions"
-    resources_url = "https://www.reddit.com/r/datascience/wiki/resources"
-    past_threads_url = "https://www.reddit.com/r/datascience/search?q=weekly%20thread&restrict_sr=1&t=month"
+    faq = "[FAQ](https://www.reddit.com/r/datascience/wiki/frequently-asked-questions)"
+    resources = "[Resources](https://www.reddit.com/r/datascience/wiki/resources)"
+    past_weekly_threads = "[past weekly threads](https://www.reddit.com/r/datascience/search?q=weekly%20thread&restrict_sr=1&sort=new)"
 
-    selftext = (
+    selftext = add_boilerplate(
         "Welcome to this week's entering & transitioning thread! "
         "This thread is for any questions about getting started, studying, or "
         "transitioning into the data science field. Topics include:\n"
@@ -160,12 +160,9 @@ def post_weekly_thread(subreddit: praw.models.reddit.subreddit) -> None:
         "* Job search questions (e.g. resumes, applying, career prospects)\n"
         "* Elementary questions (e.g. where to start, what next)\n"
         "\n"
-        "While you wait for answers from the community, check out the "
-        f"[FAQ]({faq_url}) and [Resources]({resources_url}) pages on our wiki.\n"
-        "\n"
-        f"[You can also search for past weekly threads here]({past_threads_url}).\n"
-        "\n"
-        f"^(Posted at {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC)"
+        f"While you wait for answers from the community, check out the {faq} "
+        f"and {resources} pages on our wiki. You can also search for "
+        f"{past_weekly_threads}."
     )
 
     ## 2. Post the submission

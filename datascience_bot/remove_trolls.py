@@ -7,6 +7,8 @@ from typing import Coroutine
 
 import praw
 
+from datascience_bot import add_boilerplate
+
 
 logger = logging.getLogger(__name__)
 
@@ -41,28 +43,27 @@ def remove_troll_submission(submission: praw.models.reddit.submission) -> None:
         submission.mod.remove(spam=True)
     if total_karma <= 50:
         # long urls
-        weekly_thread_url = "https://www.reddit.com/r/datascience/search?q=Weekly%20Entering%20%26%20Transitioning%20Thread&restrict_sr=1&t=week"
-        wiki_url = "https://www.reddit.com/r/datascience/wiki/index"
-        message_the_mods_url = (
-            "https://www.reddit.com/message/compose?to=%2Fr%2Fdatascience"
-        )
-        comment = submission.reply(
+        weekly_thread = "[weekly entering & transitioning thread](https://www.reddit.com/r/datascience/search?q=Weekly%20Entering%20%26%20Transitioning%20Thread&restrict_sr=1&t=week)"
+        the_wiki = "[the wiki](https://www.reddit.com/r/datascience/wiki/index)"
+        message_the_mods = "[message the mods](https://www.reddit.com/message/compose?to=%2Fr%2Fdatascience)"
+
+        text = add_boilerplate(
             f"I removed your submission to r/{submission.subreddit.display_name}.\n"
-            "\n"
+            f"\n"
             f"r/{submission.subreddit.display_name} gets a lot of posts from "
-            "new redditors. It's likely your topic or question has been "
-            "discussed at length before, so we remove posts from authors with "
+            f"new redditors. It's likely your topic or question has been "
+            f"discussed at length before, so we remove posts from authors with "
             f"less than 50 karma as a rule. You only have {total_karma} "
-            "karma right now.\n"
-            "\n"
-            f"The [weekly entering & transitioning thread]({weekly_thread_url}) "
-            "is a good place to start. You may also find useful resources on "
-            f"[the wiki]({wiki_url}).\n"
-            "\n"
-            "If you believe this is an error, or you're intentionally posting "
-            "with a throwaway account, please "
-            f"[message the mods]({message_the_mods_url}) to approve your post."
+            f"karma right now.\n"
+            f"\n"
+            f"The {weekly_thread} is a good place to start. You may also find "
+            f"useful resources on {the_wiki}.\n"
+            f"\n"
+            f"If you believe this is an error, or you're intentionally posting "
+            f"with a throwaway account, please {message_the_mods} to approve "
+            f"your submission."
         )
+        comment = submission.reply(text)
         comment.mod.distinguish(how="yes", sticky=True)
 
         submission.mod.remove(spam=False)
