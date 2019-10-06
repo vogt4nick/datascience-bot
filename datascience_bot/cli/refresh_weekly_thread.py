@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 import logging
 import os
 import sys
-import time
 from typing import Dict, Tuple
 
 import praw
@@ -209,10 +208,8 @@ def direct_unanswered_comments_to_weekly_thread(
 
     for comment in old_thread.comments:
         if len(comment.replies) == 0:
-            comment.reply(msg)
-            # sleep to ensure comment is "committed"; else we get a 403 error
-            time.sleep(1)
-            comment.mod.distinguish(how="yes")
+            reply = comment.reply(msg)
+            reply.mod.distinguish(how="yes")
 
 
 def main():
