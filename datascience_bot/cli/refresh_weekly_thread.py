@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import logging
 import os
 import sys
+import time
 from typing import Dict, Tuple
 
 import praw
@@ -55,7 +56,7 @@ def get_weekly_thread(
         if (
             submission.subreddit == subreddit
             and submission.title.startswith("Weekly Entering & Transitioning Thread")
-            and submission.stickied
+            and submission.stickied == True
             and submission.author == "datascience-bot"
         ):
             logger.info(
@@ -107,23 +108,6 @@ def validate_task(reddit: praw.models.reddit) -> None:
                 f"{end_date.strftime('%d %b %Y')}."
             )
             raise InvalidTaskError(msg)
-
-
-def unsticky_weekly_thread(reddit: praw.models.reddit) -> praw.models.Submission:
-    """Unsticky the last weekly entering & transitioning thread
-
-    Args:
-        reddit (praw.models.reddit): which reddit to search for sticky
-
-    Return:
-        praw.models.Submission: Now unstickied weekly thread
-    """
-    logger.info("Remove last weekly entering & transitioning thread")
-
-    last_weekly_thread = get_weekly_thread(reddit)
-    last_weekly_thread.mod.sticky(state=False)
-
-    return last_weekly_thread
 
 
 def post_weekly_thread(reddit: praw.models.reddit) -> praw.models.Submission:
@@ -200,10 +184,9 @@ def direct_unanswered_comments_to_weekly_thread(
 
     new_weekly_thread_md = f"[new weekly thread]({new_thread.permalink})"
     msg = add_boilerplate(
-        f"I created a {new_weekly_thread_md}. Since you didn't receive any "
-        "replies here, please feel free to resubmit your comment in the new "
-        "thread.\n\n"
-        "Thanks."
+        f"I created a {new_weekly_thread_md}. Since you haven't received any "
+        "replies yet, please feel free to resubmit your comment in the new "
+        "thread."
     )
 
     for comment in old_thread.comments:
@@ -212,7 +195,7 @@ def direct_unanswered_comments_to_weekly_thread(
             reply.mod.distinguish(how="yes")
 
 
-def main():
+def main(validate: bool = True):
     """Refresh the weekly thread
     """
     logger.info("Enter post_weekly_thread.main.py")
@@ -221,13 +204,27 @@ def main():
     SUBREDDIT_NAME = os.getenv("SUBREDDIT_NAME")
     reddit = get_datascience_bot()
     subreddit = reddit.subreddit(display_name=SUBREDDIT_NAME)
-
     logger.info(f"Acting on subreddit: {subreddit.display_name}")
 
-    validate_task(reddit)  # raises error if not valid
-    old_thread = unsticky_weekly_thread(reddit)
+    if validate:
+        logger.debug("Validating task")
+        validate_task(reddit)  # raises error if not valid
+
+    logger.debug("Unsticky the last weekly thread")
+    old_thread = get_weekly_thread(reddit)
+    old_thread.mod.sticky(state=False)
+
+    logger.debug("Post the new weekly thread")
     new_thread = post_weekly_thread(reddit)
 
+    # PRAW will not request pages more than once every 30 seconds. If you try,
+    # it returns the cached version. Our cached version of page (created in
+    # conf.py) doesn't have the new weekly thread we're creating for these
+    # tests.
+    # https://praw.readthedocs.io/en/v3.6.0/pages/faq.html#i-made-a-change-but-it-doesn-t-seem-to-have-an-effect
+    time.sleep(30)
+
+    logger.debug("Directed unanswered comments to the new weekly thread")
     direct_unanswered_comments_to_weekly_thread(
         reddit, old_thread_id=old_thread.id, new_thread_id=new_thread.id
     )

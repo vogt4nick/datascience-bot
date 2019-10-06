@@ -30,11 +30,11 @@ def test__add_boilerplate():
 #     return None
 
 
-def test__submission_is_deleted(datascience_bot_reddit, SubstantialStrain6_reddit):
+def test__submission_is_deleted():
     ## Create a post with u/SubstantialStrain6
     # fmt: off
     user_submission = (
-        SubstantialStrain6_reddit
+        get_SubstantialStrain6()
         .subreddit(display_name="datascience_bot_dev")
         .submit(
             title=f"Test datascience_bot:submission_is_removed | {TEST_TIME}",
@@ -45,7 +45,7 @@ def test__submission_is_deleted(datascience_bot_reddit, SubstantialStrain6_reddi
     # fmt: on
 
     # View u/SubstantialStrain6's post with u/datascience-bot
-    mod = datascience_bot_reddit
+    mod = get_datascience_bot()
     submission = update(user_submission, mod)
 
     assert submission_is_deleted(submission, mod) == False
@@ -55,11 +55,11 @@ def test__submission_is_deleted(datascience_bot_reddit, SubstantialStrain6_reddi
     assert submission_is_deleted(submission, mod) == True
 
 
-def test__submission_is_removed(datascience_bot_reddit, SubstantialStrain6_reddit):
+def test__submission_is_removed():
     ## Create a post with u/SubstantialStrain6
     # fmt: off
     user_submission = (
-        SubstantialStrain6_reddit
+        get_SubstantialStrain6()
         .subreddit(display_name="datascience_bot_dev")
         .submit(
             title=f"Test datascience_bot:submission_is_removed | {TEST_TIME}",
@@ -70,7 +70,7 @@ def test__submission_is_removed(datascience_bot_reddit, SubstantialStrain6_reddi
     # fmt: on
 
     # View u/SubstantialStrain6's post with u/datascience-bot
-    mod = datascience_bot_reddit
+    mod = get_datascience_bot()
     submission = update(user_submission, mod)
 
     assert submission_is_removed(submission, mod) == False
