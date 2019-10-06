@@ -22,6 +22,9 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
+SUBREDDIT_NAME = os.getenv("SUBREDDIT_NAME")
+
+
 class MissingSubmissionError(Exception):
     """When we can't find a particular submission."""
 
@@ -30,14 +33,14 @@ class InvalidTaskError(Exception):
     """When the task is invalid for on reason or another"""
 
 
-def get_last_weekly_thread(
-    subreddit: praw.models.reddit.subreddit
+def get_weekly_thread(
+    reddit: praw.models.reddit.subreddit
 ) -> praw.models.reddit.submission:
     """Get the last weekly thread created by u/datascience-bot
 
     Args:
-        subreddit (praw.models.reddit.subreddit): Subreddit to search for last
-            weekly thread
+        reddit (praw.models.reddit): Which reddit to search for last
+            weekly thread with
 
     Returns:
         praw.models.reddit.submission: Last stickied thread in the given
@@ -47,6 +50,7 @@ def get_last_weekly_thread(
     Raises:
         MissingSubmissionError: When last weekly thread can't be found
     """
+    subreddit = reddit.subreddit(SUBREDDIT_NAME)
     for submission in subreddit.hot(limit=2):  # max 2 possible stickies
         if (
             submission.subreddit == subreddit
@@ -63,12 +67,11 @@ def get_last_weekly_thread(
         raise MissingSubmissionError("Could not find the last stickied thread")
 
 
-def validate_task(subreddit: praw.models.reddit.subreddit) -> None:
+def validate_task(reddit: praw.models.reddit) -> None:
     """Validate whether it's appropriate to run the task right now
 
     Args:
-        subreddit (praw.models.reddit.subreddit): which subreddit to validate
-            task against.
+        reddit (praw.models.reddit): which reddit to validate task with
 
     Raise:
         InvalidTaskError: When it's not Sunday UTC time or the current weekly
@@ -79,16 +82,15 @@ def validate_task(subreddit: praw.models.reddit.subreddit) -> None:
     # test if its Sunday
     now = datetime.utcnow()
     if now.strftime("%A") != "Sunday":
-        msg = (
+        raise InvalidTaskError(
             "This post_weekly_thread task is invalid. "
             "post_weekly_thread must be run on Sundays UTC time. "
             f"Right now it's {now.strftime('%A')} UTC time."
         )
-        raise InvalidTaskError(msg)
 
     # get the last thread to determine when it was posted
     try:
-        last_weekly_thread = get_last_weekly_thread(subreddit)
+        last_weekly_thread = get_weekly_thread(reddit)
     except MissingSubmissionError as err:
         # warn and raise no error
         logger.warning(err)
@@ -107,22 +109,24 @@ def validate_task(subreddit: praw.models.reddit.subreddit) -> None:
             raise InvalidTaskError(msg)
 
 
-def unsticky_last_weekly_thread(subreddit: praw.models.reddit.subreddit) -> None:
+def unsticky_weekly_thread(reddit: praw.models.reddit) -> praw.models.Submission:
     """Unsticky the last weekly entering & transitioning thread
 
     Args:
-        subreddit (praw.models.reddit.subreddit): which subreddit to search
-            for sticky
+        reddit (praw.models.reddit): which reddit to search for sticky
+
+    Return:
+        praw.models.Submission: Now unstickied weekly thread
     """
     logger.info("Remove last weekly entering & transitioning thread")
 
-    last_weekly_thread = get_last_weekly_thread(subreddit)
+    last_weekly_thread = get_weekly_thread(reddit)
     last_weekly_thread.mod.sticky(state=False)
 
-    logger.debug("Successfully removed last sticky thread posted by u/datascience-bot")
+    return last_weekly_thread
 
 
-def post_weekly_thread(subreddit: praw.models.reddit.subreddit) -> None:
+def post_weekly_thread(reddit: praw.models.reddit) -> praw.models.Submission:
     """Post the weekly thread with required attributes
 
     `post_weekly_thread` does three things:
@@ -131,8 +135,10 @@ def post_weekly_thread(subreddit: praw.models.reddit.subreddit) -> None:
         3. Distinguish, sticky, flair, etc.
 
     Args:
-        subreddit (praw.models.reddit.subreddit): which subreddit to post
-            weekly thread
+        reddit (praw.models.reddit): which reddit to post weekly thread
+
+    Return:
+        praw.models.Submission: New weekly thread
     """
     logger.info("Post weekly entering & transitioning thread")
 
@@ -166,7 +172,9 @@ def post_weekly_thread(subreddit: praw.models.reddit.subreddit) -> None:
     )
 
     ## 2. Post the submission
-    submission = subreddit.submit(title=title, selftext=selftext, send_replies=False)
+    submission = reddit.subreddit(SUBREDDIT_NAME).submit(
+        title=title, selftext=selftext, send_replies=False
+    )
 
     ## 3. Distinguish, sticky, flair, etc.
     submission.mod.flair(text="Discussion")
@@ -174,7 +182,34 @@ def post_weekly_thread(subreddit: praw.models.reddit.subreddit) -> None:
     submission.mod.distinguish()
     submission.mod.sticky(state=True, bottom=True)
 
-    logger.debug("Successfully posted weekly entering & transitioning thread")
+    return submission
+
+
+def direct_unanswered_comments_to_weekly_thread(
+    reddit: praw.models.reddit, old_thread_id: str, new_thread_id: str
+) -> None:
+    """Direct unanswered comments in last weekly thread to the new weekly thread
+
+    Args:
+        reddit (praw.models.reddit): Reddit account to comment with
+        old_thread_id (str)
+        new_thread_id (str)
+    """
+    old_thread = reddit.submission(id=old_thread_id)
+    new_thread = reddit.submission(id=new_thread_id)
+
+    new_weekly_thread_md = f"[new weekly thread]({new_thread.permalink})"
+    msg = add_boilerplate(
+        f"I created a {new_weekly_thread_md}. Since you didn't receive any "
+        "replies here, please feel free to resubmit your comment in the new "
+        "thread.\n\n"
+        "Thanks."
+    )
+
+    for comment in old_thread.comments:
+        if len(comment.replies) == 0:
+            reply = comment.reply(msg)
+            reply.mod.distinguish(how="yes")
 
 
 def main():
@@ -189,32 +224,17 @@ def main():
 
     logger.info(f"Acting on subreddit: {subreddit.display_name}")
 
-    try:
-        validate_task(subreddit)  # raises error if not valid
-    except InvalidTaskError as err:
-        logger.info(err)
-        logger.info("Exit post_weekly_thread.main.py")
-        return None
+    validate_task(reddit)  # raises error if not valid
+    old_thread = unsticky_weekly_thread(reddit)
+    new_thread = post_weekly_thread(reddit)
 
-    try:
-        unsticky_last_weekly_thread(subreddit)
-    except MissingSubmissionError as err:
-        pass
-        # raise MissingSubmissionError(err)
-    # else:
-    post_weekly_thread(subreddit)
-
-    logger.info("Exit post_weekly_thread.main.py")
+    direct_unanswered_comments_to_weekly_thread(
+        reddit, old_thread_id=old_thread.id, new_thread_id=new_thread.id
+    )
 
 
 if __name__ == "__main__":
-    from datascience_bot import get_datascience_bot
-
-    SUBREDDIT_NAME = os.getenv("SUBREDDIT_NAME")
     if SUBREDDIT_NAME != "datascience_bot_dev":
         raise Exception("Test only against r/datascience_bot_dev!")
-
-    reddit = get_datascience_bot()
-    subreddit = reddit.subreddit(display_name=SUBREDDIT_NAME)
 
     main()
