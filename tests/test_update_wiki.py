@@ -7,7 +7,7 @@ import pathlib
 import praw
 import pytest
 
-from datascience_bot import __version__
+from datascience_bot import __version__, get_datascience_bot
 from datascience_bot.cli import update_wiki
 
 TEST_TIME = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
@@ -17,7 +17,7 @@ if SUBREDDIT_NAME != "datascience_bot_dev":
     raise Exception("Test only against r/datascience_bot_dev!")
 
 
-def test__update_wiki(datascience_bot_reddit):
+def test__update_wiki():
     from datascience_bot import wiki
 
     local_wiki_dir = pathlib.Path(wiki.__file__).parent
@@ -31,7 +31,7 @@ def test__update_wiki(datascience_bot_reddit):
         },
     )
 
-    datascience_bot = datascience_bot_reddit
+    datascience_bot = get_datascience_bot()
     for wiki_page in datascience_bot.subreddit(SUBREDDIT_NAME).wiki:
         if wiki_page.name in local_wiki_content:
             wiki_page.edit(content="", reason=f"Testing {__version__} at {TEST_TIME}")

@@ -1,84 +1,25 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 
 import praw
 import pytest
 
+from datascience_bot import get_datascience_bot, get_SubstantialStrain6, get_b3405920
+
 
 TEST_TIME = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
 
 
-@pytest.fixture
-def datascience_bot_reddit() -> praw.reddit:
-    """Create a reddit instance with u/datascience-bot
-
-    Returns:
-        praw.models.reddit: A reddit instance with u/datascience-bot
-    """
-    return praw.Reddit(
-        username=os.getenv("DATASCIENCE_BOT_USERNAME"),
-        password=os.getenv("DATASCIENCE_BOT_PASSWORD"),
-        client_id=os.getenv("DATASCIENCE_BOT_CLIENT_ID"),
-        client_secret=os.getenv("DATASCIENCE_BOT_CLIENT_SECRET"),
-        user_agent="datascience-bot",
-    )
-
-
-@pytest.fixture
-def SubstantialStrain6_reddit() -> praw.models.reddit:
-    """Create a reddit instance with u/SubstantialStrain6
-
-    Returns:
-        praw.models.reddit: A reddit instance with u/SubstantialStrain6
-    """
-    return praw.Reddit(
-        username=os.getenv("SUBSTANTIALSTRAIN6_USERNAME"),
-        password=os.getenv("SUBSTANTIALSTRAIN6_PASSWORD"),
-        client_id=os.getenv("SUBSTANTIALSTRAIN6_CLIENT_ID"),
-        client_secret=os.getenv("SUBSTANTIALSTRAIN6_CLIENT_SECRET"),
-        user_agent="SubstantialStrain6",
-    )
-
-
-@pytest.fixture
-def b3405920_reddit() -> praw.models.reddit:
-    """Create a reddit instance with u/b3405920
-
-    Returns:
-        praw.models.reddit: A reddit instance with u/b3405920
-    """
-    return praw.Reddit(
-        username=os.getenv("B3405920_USERNAME"),
-        password=os.getenv("B3405920_PASSWORD"),
-        client_id=os.getenv("B3405920_CLIENT_ID"),
-        client_secret=os.getenv("B3405920_CLIENT_SECRET"),
-        user_agent="b3405920",
-    )
+SUBREDDIT_NAME = os.getenv("SUBREDDIT_NAME")
+if SUBREDDIT_NAME != "datascience_bot_dev":
+    raise Exception("Test only against r/datascience_bot_dev!")
 
 
 def remove_all_user_submissions_to_datascience_bot_dev():
-    datascience_bot = praw.Reddit(
-        username=os.getenv("DATASCIENCE_BOT_USERNAME"),
-        password=os.getenv("DATASCIENCE_BOT_PASSWORD"),
-        client_id=os.getenv("DATASCIENCE_BOT_CLIENT_ID"),
-        client_secret=os.getenv("DATASCIENCE_BOT_CLIENT_SECRET"),
-        user_agent="datascience-bot",
-    )
-    SubstantialStrain6 = praw.Reddit(
-        username=os.getenv("SUBSTANTIALSTRAIN6_USERNAME"),
-        password=os.getenv("SUBSTANTIALSTRAIN6_PASSWORD"),
-        client_id=os.getenv("SUBSTANTIALSTRAIN6_CLIENT_ID"),
-        client_secret=os.getenv("SUBSTANTIALSTRAIN6_CLIENT_SECRET"),
-        user_agent="SubstantialStrain6",
-    )
-    b3405920 = praw.Reddit(
-        username=os.getenv("B3405920_USERNAME"),
-        password=os.getenv("B3405920_PASSWORD"),
-        client_id=os.getenv("B3405920_CLIENT_ID"),
-        client_secret=os.getenv("B3405920_CLIENT_SECRET"),
-        user_agent="b3405920",
-    )
+    datascience_bot = get_datascience_bot()
+    SubstantialStrain6 = get_SubstantialStrain6()
+    b3405920 = get_b3405920()
 
     for reddit in (datascience_bot, SubstantialStrain6, b3405920):
         username = reddit.user.me().name
@@ -98,13 +39,8 @@ def remove_all_datascience_bot_dev_submissions():
 
     https://stackoverflow.com/a/17844938
     """
-    reddit = praw.Reddit(
-        username=os.getenv("DATASCIENCE_BOT_USERNAME"),
-        password=os.getenv("DATASCIENCE_BOT_PASSWORD"),
-        client_id=os.getenv("DATASCIENCE_BOT_CLIENT_ID"),
-        client_secret=os.getenv("DATASCIENCE_BOT_CLIENT_SECRET"),
-        user_agent="datascience-bot",
-    )
+    reddit = get_datascience_bot()
+
     subreddit = reddit.subreddit("datascience_bot_dev")
     for submission in subreddit.new(limit=1000):
         comment = submission.reply(
@@ -114,10 +50,42 @@ def remove_all_datascience_bot_dev_submissions():
         submission.mod.remove(spam=False)
 
 
+def make_existing_thread() -> praw.models.Submission:
+    datascience_bot = get_datascience_bot()
+    SubstantialStrain6 = get_SubstantialStrain6()
+    b3405920 = get_b3405920()
+
+    weekly_thread = datascience_bot.subreddit(SUBREDDIT_NAME).submit(
+        title=(
+            "Weekly Entering & Transitioning Thread | "
+            f"{(datetime.utcnow() - timedelta(days=7)).strftime('%d %b %Y')} - "
+            f"{datetime.utcnow().strftime('%d %b %Y')}"
+        ).strip(),
+        selftext="Testing",
+        send_replies=False,
+    )
+    weekly_thread.mod.approve()
+    weekly_thread.mod.distinguish()
+    weekly_thread.mod.sticky(state=True, bottom=True)
+
+    # make a comment that will go unanswered
+    SubstantialStrain6.submission(id=weekly_thread.id).reply(
+        "I have a question that will go unanswered"
+    )
+
+    # make a comment and answer it
+    comment = b3405920.submission(id=weekly_thread.id).reply(
+        "I have a question that will be answered by SubstantialStrain6"
+    )
+    SubstantialStrain6.comment(id=comment.id).reply("I'm answering your question")
+
+    return weekly_thread
+
+
 def pytest_sessionstart(session):
-    """
-    Called after the Session object has been created and
-    before performing collection and entering the run test loop.
+    """Called after the Session object has been created and before performing
+    collection and entering the run test loop.
     """
     remove_all_datascience_bot_dev_submissions()
     remove_all_user_submissions_to_datascience_bot_dev()
+    make_existing_thread()
