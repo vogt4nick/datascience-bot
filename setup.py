@@ -26,6 +26,8 @@ setup(
         ]
     },
     install_requires=requirements,
+    zip_safe=True,
+    include_package_data=True,
     test_suite="tests",
     tests_require="pytest",
     classifiers=[
