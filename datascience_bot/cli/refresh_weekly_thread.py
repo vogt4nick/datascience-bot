@@ -82,12 +82,11 @@ def validate_task(reddit: praw.models.reddit) -> None:
     # test if its Sunday
     now = datetime.utcnow()
     if now.strftime("%A") != "Sunday":
-        msg = (
+        raise InvalidTaskError(
             "This post_weekly_thread task is invalid. "
             "post_weekly_thread must be run on Sundays UTC time. "
             f"Right now it's {now.strftime('%A')} UTC time."
         )
-        raise InvalidTaskError(msg)
 
     # get the last thread to determine when it was posted
     try:
@@ -200,7 +199,7 @@ def direct_unanswered_comments_to_weekly_thread(
     new_thread = reddit.submission(id=new_thread_id)
 
     new_weekly_thread_md = f"[new weekly thread]({new_thread.permalink})"
-    msg = (
+    msg = add_boilerplate(
         f"I created a {new_weekly_thread_md}. Since you didn't receive any "
         "replies here, please feel free to resubmit your comment in the new "
         "thread.\n\n"
