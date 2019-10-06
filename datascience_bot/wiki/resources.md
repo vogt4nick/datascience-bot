@@ -146,4 +146,4 @@ Below are a few that stand out, either because they are introductory courses, th
 
 ---
 
-See something missing? Visit our [GitHub Repo](https://github.com/vogt4nick/datascience-wiki) and make a pull request.
+See something missing? Visit our [GitHub Repo](https://github.com/vogt4nick/datascience-bot) and make a pull request.
