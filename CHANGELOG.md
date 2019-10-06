@@ -31,6 +31,7 @@
 ### Added
 
 - #17 Add boilerplate to all communications so readers know it's a bot
+
 ---
 
 ## 2019.10.2
